@@ -1,7 +1,9 @@
 "use client";
-
 import Image from "next/image";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { routeModule } from "next/dist/build/templates/pages";
+import Link from "next/link";
 
 const cities = [
   "Mumbai", "Delhi", "Bangalore", "Chennai", "Hyderabad",
@@ -65,6 +67,8 @@ export default function HeroSection() {
     setFrom(to);
     setTo(from);
   };
+
+const router = useRouter();
 
   const handleSearch = () => {
     if (!from || !to || !date) {
@@ -368,6 +372,7 @@ export default function HeroSection() {
 
                         {/* Book button */}
                         <td className="px-4 py-4 text-right whitespace-nowrap">
+                          <Link href = "/passengers/buy-ticket">
                           <button
                             disabled={soldOut}
                             className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${soldOut
@@ -377,6 +382,7 @@ export default function HeroSection() {
                           >
                             {soldOut ? "Unavailable" : "Book Now"}
                           </button>
+                          </Link>
                         </td>
                       </tr>
                     );
