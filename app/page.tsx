@@ -1,9 +1,9 @@
-import { TrendingDown } from "lucide-react";
 import Footer from "../components/Footer";
 import Image from "next/image";
 import React from "react";
 import TrendingPlace from "../components/TrendingPlace";
 import WhyBustify from "../components/WhyBustify"
+import Cards from "@/components/Cards";
 
 
 
@@ -43,10 +43,16 @@ const Home = () => {
       </div>
 
 
+      <div className="w-[90%] mt-20">
+        <h2 className= "text-4xl font-bold text-center mb-12">Find Popular places</h2>
+
+          <Cards/>
+      </div>
+
       {/* Trending Destinations Section */}
       <div className="w-[90%] mt-16">
         <div className="flex justify-between items-center mb-12">
-          <h2 className="text-4xl font-bold text-gray-900">
+          <h2 className="text-4xl font-bold text-gray-900 ">
             Trending destinations
           </h2>
         </div>
