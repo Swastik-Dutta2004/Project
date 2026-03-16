@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { routeModule } from "next/dist/build/templates/pages";
 import Link from "next/link";
+import busData from "@/public/buses.json"
 
 const cities = [
   "Mumbai", "Delhi", "Bangalore", "Chennai", "Hyderabad",
@@ -24,18 +25,7 @@ type Bus = {
   amenities: string[];
 };
 
-const busData: Bus[] = [
-  { id: 1, name: "GreenLine Express", type: "AC Sleeper", departure: "06:00 AM", arrival: "02:30 PM", duration: "8h 30m", seats: 12, price: 849, rating: 4.5, amenities: ["WiFi", "Charging", "Blanket"] },
-  { id: 2, name: "Royal Cruiser", type: "AC Seater", departure: "08:30 AM", arrival: "04:00 PM", duration: "7h 30m", seats: 24, price: 599, rating: 4.2, amenities: ["WiFi", "Charging"] },
-  { id: 3, name: "Skyline Travels", type: "Non-AC Sleeper", departure: "09:45 AM", arrival: "06:15 PM", duration: "8h 30m", seats: 5, price: 450, rating: 3.9, amenities: ["Charging"] },
-  { id: 4, name: "Comfort Ride", type: "AC Sleeper", departure: "11:00 PM", arrival: "07:00 AM", duration: "8h 00m", seats: 0, price: 950, rating: 4.7, amenities: ["WiFi", "Charging", "Blanket", "Snacks"] },
-  { id: 5, name: "CityLink Bus", type: "AC Seater", departure: "02:00 PM", arrival: "09:30 PM", duration: "7h 30m", seats: 18, price: 620, rating: 4.1, amenities: ["WiFi"] },
-  { id: 6, name: "Night Rider Express", type: "Non-AC Seater", departure: "05:30 AM", arrival: "01:00 PM", duration: "7h 30m", seats: 30, price: 320, rating: 3.7, amenities: [] },
-  { id: 7, name: "Swift Journey", type: "AC Sleeper", departure: "10:00 PM", arrival: "06:30 AM", duration: "8h 30m", seats: 8, price: 780, rating: 4.3, amenities: ["WiFi", "Blanket"] },
-  { id: 8, name: "BlueWave Travels", type: "AC Seater", departure: "07:15 AM", arrival: "03:00 PM", duration: "7h 45m", seats: 3, price: 560, rating: 4.0, amenities: ["Charging"] },
-  { id: 9, name: "Golden Route Bus", type: "Non-AC Seater", departure: "12:00 PM", arrival: "08:00 PM", duration: "8h 00m", seats: 22, price: 290, rating: 3.5, amenities: [] },
-  { id: 10, name: "Rapid Transit", type: "AC Seater", departure: "04:45 PM", arrival: "11:30 PM", duration: "6h 45m", seats: 15, price: 670, rating: 4.6, amenities: ["WiFi", "Charging", "Snacks"] },
-];
+// const busData: Bus[] = 
 
 const busTypeStyles: Record<string, string> = {
   "AC Sleeper": "bg-blue-100 text-blue-700",
@@ -71,17 +61,17 @@ export default function HeroSection() {
 const router = useRouter();
 
   const handleSearch = () => {
-    if (!from || !to || !date) {
-      setError("Please fill in From, To, and Travel Date.");
-      return;
-    }
-    if (from === to) {
-      setError("Origin and destination cannot be the same.");
-      return;
-    }
-    setError("");
-    setSearchResult({ from, to, date, passengers });
-  };
+  if (!from || !to || !date) {
+    setError("Please fill in From, To, and Travel Date.");
+    return;
+  }
+  if (from === to) {
+    setError("Origin and destination cannot be the same.");
+    return;
+  }
+  setError("");
+  router.push(`/buses?from=${from}&to=${to}&date=${date}&passengers=${passengers}`);
+}
 
   const handleSort = (key: SortKey) => {
     if (sortBy === key) {
@@ -234,167 +224,8 @@ const router = useRouter();
       </div>
 
       {/* ── Bus Results Table (only shown after search) ── */}
-      {searchResult && (
-        <div className="w-[90%] mt-10">
-
-          {/* Results header */}
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">Available Buses</h2>
-              <p className="text-sm text-gray-500 mt-0.5">
-                <span className="font-medium text-gray-700">{searchResult.from}</span>
-                {" → "}
-                <span className="font-medium text-gray-700">{searchResult.to}</span>
-                <span className="mx-2 text-gray-300">·</span>
-                {new Date(searchResult.date).toLocaleDateString("en-IN", {
-                  day: "numeric", month: "short", year: "numeric",
-                })}
-                <span className="mx-2 text-gray-300">·</span>
-                {searchResult.passengers} {searchResult.passengers === 1 ? "passenger" : "passengers"}
-              </p>
-            </div>
-            <span className="text-sm text-gray-400">{sortedBuses.length} buses found</span>
-          </div>
-
-          {/* Table */}
-          <div className="rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-
-                <thead>
-                  <tr className="bg-gray-50 border-b border-gray-200 text-left">
-                    <th className="px-4 py-3.5 font-semibold text-gray-500 whitespace-nowrap">#</th>
-                    <th className="px-4 py-3.5 font-semibold text-gray-500 whitespace-nowrap">Bus Name</th>
-                    <th className="px-4 py-3.5 font-semibold text-gray-500 whitespace-nowrap">Type</th>
-                    <th
-                      className="px-4 py-3.5 font-semibold text-gray-500 whitespace-nowrap cursor-pointer hover:text-blue-600 select-none"
-                      onClick={() => handleSort("departure")}
-                    >
-                      Departure <SortIcon col="departure" />
-                    </th>
-                    <th className="px-4 py-3.5 font-semibold text-gray-500 whitespace-nowrap">Arrival</th>
-                    <th className="px-4 py-3.5 font-semibold text-gray-500 whitespace-nowrap">Duration</th>
-                    <th className="px-4 py-3.5 font-semibold text-gray-500 whitespace-nowrap">Amenities</th>
-                    <th
-                      className="px-4 py-3.5 font-semibold text-gray-500 whitespace-nowrap cursor-pointer hover:text-blue-600 select-none"
-                      onClick={() => handleSort("seats")}
-                    >
-                      Seats <SortIcon col="seats" />
-                    </th>
-                    <th
-                      className="px-4 py-3.5 font-semibold text-gray-500 whitespace-nowrap cursor-pointer hover:text-blue-600 select-none"
-                      onClick={() => handleSort("rating")}
-                    >
-                      Rating <SortIcon col="rating" />
-                    </th>
-                    <th
-                      className="px-4 py-3.5 font-semibold text-gray-500 whitespace-nowrap cursor-pointer hover:text-blue-600 select-none text-right"
-                      onClick={() => handleSort("price")}
-                    >
-                      Price <SortIcon col="price" />
-                    </th>
-                    <th className="px-4 py-3.5" />
-                  </tr>
-                </thead>
-
-                <tbody className="divide-y divide-gray-100 bg-white">
-                  {sortedBuses.map((bus, idx) => {
-                    const soldOut = bus.seats === 0;
-                    return (
-                      <tr
-                        key={bus.id}
-                        className={`transition-colors ${soldOut ? "opacity-50" : "hover:bg-blue-50/40"}`}
-                      >
-                        {/* # */}
-                        <td className="px-4 py-4 text-gray-400">{idx + 1}</td>
-
-                        {/* Name */}
-                        <td className="px-4 py-4 font-semibold text-gray-800 whitespace-nowrap">{bus.name}</td>
-
-                        {/* Type badge */}
-                        <td className="px-4 py-4 whitespace-nowrap">
-                          <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${busTypeStyles[bus.type]}`}>
-                            {bus.type}
-                          </span>
-                        </td>
-
-                        {/* Departure */}
-                        <td className="px-4 py-4 font-medium text-gray-700 whitespace-nowrap">{bus.departure}</td>
-
-                        {/* Arrival */}
-                        <td className="px-4 py-4 text-gray-600 whitespace-nowrap">{bus.arrival}</td>
-
-                        {/* Duration */}
-                        <td className="px-4 py-4 text-gray-500 whitespace-nowrap">{bus.duration}</td>
-
-                        {/* Amenities */}
-                        <td className="px-4 py-4">
-                          <div className="flex gap-1.5 flex-wrap min-w-[100px]">
-                            {bus.amenities.length > 0
-                              ? bus.amenities.map((a) => (
-                                <span key={a} className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md whitespace-nowrap">
-                                  {a}
-                                </span>
-                              ))
-                              : <span className="text-gray-400 text-xs">—</span>
-                            }
-                          </div>
-                        </td>
-
-                        {/* Seats */}
-                        <td className="px-4 py-4 whitespace-nowrap">
-                          {soldOut ? (
-                            <span className="text-xs font-medium text-red-600 bg-red-50 px-2 py-1 rounded-full">
-                              Sold out
-                            </span>
-                          ) : (
-                            <span className={`text-sm font-semibold ${bus.seats <= 5 ? "text-orange-500" : "text-green-600"}`}>
-                              {bus.seats} left
-                            </span>
-                          )}
-                        </td>
-
-                        {/* Rating */}
-                        <td className="px-4 py-4 whitespace-nowrap">
-                          <span className="flex items-center gap-1">
-                            <span className="text-amber-400">★</span>
-                            <span className="text-gray-700 font-medium">{bus.rating.toFixed(1)}</span>
-                          </span>
-                        </td>
-
-                        {/* Price */}
-                        <td className="px-4 py-4 text-right whitespace-nowrap">
-                          <span className="text-base font-bold text-gray-900">
-                            ₹{bus.price.toLocaleString("en-IN")}
-                          </span>
-                          <span className="block text-xs text-gray-400">per seat</span>
-                        </td>
-
-                        {/* Book button */}
-                        <td className="px-4 py-4 text-right whitespace-nowrap">
-                          <Link href = "/passengers/buy-ticket">
-                          <button
-                            disabled={soldOut}
-                            className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${soldOut
-                                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                : "bg-blue-600 hover:bg-blue-700 active:scale-95 text-white"
-                              }`}
-                          >
-                            {soldOut ? "Unavailable" : "Book Now"}
-                          </button>
-                          </Link>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-
-              </table>
-            </div>
-          </div>
-        </div>
-      )}
-
+      
+            
     </section>
   );
 }

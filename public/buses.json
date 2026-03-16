@@ -1,0 +1,12 @@
+[
+  { "id": 1, "name": "GreenLine Express", "type": "AC Sleeper", "departure": "06:00 AM", "arrival": "02:30 PM", "duration": "8h 30m", "seats": 12, "price": 849, "rating": 4.5, "amenities": ["WiFi", "Charging", "Blanket"] },
+  { "id": 2, "name": "Royal Cruiser", "type": "AC Seater", "departure": "08:30 AM", "arrival": "04:00 PM", "duration": "7h 30m", "seats": 24, "price": 599, "rating": 4.2, "amenities": ["WiFi", "Charging"] },
+  { "id": 3, "name": "Skyline Travels", "type": "Non-AC Sleeper", "departure": "09:45 AM", "arrival": "06:15 PM", "duration": "8h 30m", "seats": 5, "price": 450, "rating": 3.9, "amenities": ["Charging"] },
+  { "id": 4, "name": "Comfort Ride", "type": "AC Sleeper", "departure": "11:00 PM", "arrival": "07:00 AM", "duration": "8h 00m", "seats": 0, "price": 950, "rating": 4.7, "amenities": ["WiFi", "Charging", "Blanket", "Snacks"] },
+  { "id": 5, "name": "CityLink Bus", "type": "AC Seater", "departure": "02:00 PM", "arrival": "09:30 PM", "duration": "7h 30m", "seats": 18, "price": 620, "rating": 4.1, "amenities": ["WiFi"] },
+  { "id": 6, "name": "Night Rider Express", "type": "Non-AC Seater", "departure": "05:30 AM", "arrival": "01:00 PM", "duration": "7h 30m", "seats": 30, "price": 320, "rating": 3.7, "amenities": [] },
+  { "id": 7, "name": "Swift Journey", "type": "AC Sleeper", "departure": "10:00 PM", "arrival": "06:30 AM", "duration": "8h 30m", "seats": 8, "price": 780, "rating": 4.3, "amenities": ["WiFi", "Blanket"] },
+  { "id": 8, "name": "BlueWave Travels", "type": "AC Seater", "departure": "07:15 AM", "arrival": "03:00 PM", "duration": "7h 45m", "seats": 3, "price": 560, "rating": 4.0, "amenities": ["Charging"] },
+  { "id": 9, "name": "Golden Route Bus", "type": "Non-AC Seater", "departure": "12:00 PM", "arrival": "08:00 PM", "duration": "8h 00m", "seats": 22, "price": 290, "rating": 3.5, "amenities": [] },
+  { "id": 10, "name": "Rapid Transit", "type": "AC Seater", "departure": "04:45 PM", "arrival": "11:30 PM", "duration": "6h 45m", "seats": 15, "price": 670, "rating": 4.6, "amenities": ["WiFi", "Charging", "Snacks"] }
+]
