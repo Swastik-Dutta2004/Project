@@ -101,7 +101,27 @@ export default function HeroSection() {
     }
   }
 
+const HandleBooking = (bus:Bus) => {
+  if (bus.seats === 0) {
+    alert("No seats are available right now.")
+    return;
+  }
 
+  if (passengers > bus.seats) {
+    alert("Not enough are available.")
+    return;
+  }
+
+  const totalPrice = bus.price * passengers
+
+  Router.push(`/ticket ? 
+    busId = ${bus.id} 
+    busTo = ${to}
+    busfrom = ${from}
+    busDate = ${date}
+    busPassengers = ${passengers}
+    busTotalPrice = ${totalPrice}
+  `)
 }
 
   return (
