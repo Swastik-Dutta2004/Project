@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import buses from "@/public/buses.json"
+import { useRouter } from "next/router"
 
 interface SearchResult {
   from: string
@@ -33,8 +34,8 @@ export default function HeroSection() {
   const [passengers, setPassengers] = useState(1)
   const [searchedResult, setSearchedResult] = useState<SearchResult | null>(null)
   const [error, setError] = useState("")
-  const [sortBy, setSortBy] = useState("price");
-  const [sortDir, setSortDir] = useState("asc")
+
+  const Router = useRouter()
 
   const handleSearch = () => {
     if (!from || !to || !date) {
@@ -57,23 +58,51 @@ export default function HeroSection() {
     })
   }
 
+  type SortKey = "price" | "rating" | "seats" | "departure"
+
+  const [sortBy, setSortBy] = useState<SortKey>("price");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+
 
   const sortedBuses = [...(buses as Bus[])].sort((a, b) => {
     let diff = 0;
 
-    if (sortBy === "price") diff = a.price - b.price;
-    if (sortBy === "rating") diff = a.rating - b.rating;
-    if (sortBy === "seats") diff = a.seats - b.seats;
-    if (sortBy === "departure") diff = a.departure.localeCompare(b.departure);
+    switch (sortBy) {
+      case "price":
+        diff = a.price - b.price
+        break
+      case "rating":
+        diff = a.rating - b.rating
+        break
+      case "seats":
+        diff = a.seats - b.seats
+        break
+      case "departure":
+        diff = a.departure.localeCompare(b.departure)
+        break
+    }
 
     return sortDir === "asc" ? diff : -diff;
   });
 
-  const filterBuses = sortedBuses.filter((bus) => {
-    bus.from.toLowerCase() === from.toLowerCase() &&
+  const filterBuses = searchedResult ? sortedBuses.filter((bus) => {
+    return (
+      bus.from.toLowerCase() === from.toLowerCase() &&
       bus.to.toLowerCase() === to.toLowerCase()
-  })
+    )
+  }) : []
 
+  const handleSort = (key: SortKey) => {
+    if (sortBy === key) {
+      setSortDir((prev) => (prev === "asc" ? "desc" : "asc"))
+    } else {
+      setSortBy(key)
+      setSortDir("asc") 
+    }
+  }
+
+
+}
 
   return (
     <div>
@@ -90,12 +119,15 @@ export default function HeroSection() {
       {searchedResult && (
         <div>
           <h2>Available Buses</h2>
-          {filterBuses.map((bus) => (
+          {filterBuses.length === 0 ? (
+            <p>No buses found </p>
+          ) : filterBuses.map((bus) => (
             <div key={bus.id}>
               <p>{bus.name}</p>
               <p>{bus.price}</p>
             </div>
-          ))}
+          ))
+          }
         </div>
       )}
     </div>
