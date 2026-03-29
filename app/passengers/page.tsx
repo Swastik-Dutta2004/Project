@@ -2,7 +2,8 @@
 
 import { useState } from "react"
 import buses from "@/public/buses.json"
-import { useRouter } from "next/router"
+import { useRouter } from "next/navigation"
+import { Bus, Mouse } from "lucide-react"
 
 interface SearchResult {
   from: string
@@ -23,8 +24,7 @@ interface Bus {
   rating: number
   amenities: string[]
   from: string
-  to: string   // add this
-  // remove: from, to
+  to: string
 }
 
 export default function HeroSection() {
@@ -34,8 +34,6 @@ export default function HeroSection() {
   const [passengers, setPassengers] = useState(1)
   const [searchedResult, setSearchedResult] = useState<SearchResult | null>(null)
   const [error, setError] = useState("")
-
-  const Router = useRouter()
 
   const handleSearch = () => {
     if (!from || !to || !date) {
@@ -64,7 +62,7 @@ export default function HeroSection() {
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
 
-  const sortedBuses = [...(buses as Bus[])].sort((a, b) => {
+  const sortedBuses = [...(buses.buses as Bus[])].sort((a, b) => {
     let diff = 0;
 
     switch (sortBy) {
@@ -85,10 +83,10 @@ export default function HeroSection() {
     return sortDir === "asc" ? diff : -diff;
   });
 
-  const filterBuses = searchedResult ? sortedBuses.filter((bus) => {
+  const filteredBuses = searchedResult ? sortedBuses.filter((bus) => {
     return (
-      bus.from.toLowerCase() === from.toLowerCase() &&
-      bus.to.toLowerCase() === to.toLowerCase()
+      bus.from?.toLowerCase() === from.toLowerCase() &&
+      bus.to?.toLowerCase() === to.toLowerCase()
     )
   }) : []
 
@@ -97,40 +95,62 @@ export default function HeroSection() {
       setSortDir((prev) => (prev === "asc" ? "desc" : "asc"))
     } else {
       setSortBy(key)
-      setSortDir("asc") 
+      setSortDir("asc")
     }
   }
 
-const HandleBooking = (bus:Bus) => {
-  if (bus.seats === 0) {
-    alert("No seats are available right now.")
-    return;
+  const router = useRouter()
+
+  const HandleBooking = (bus: Bus) => {
+    if (bus.seats === 0) {
+      alert("No seats are available right now.")
+      return
+    }
+
+    if (passengers > bus.seats) {
+      alert("Not enough are available.")
+      return
+    }
+
+    const totalPrice = bus.price * passengers
+
+    router.push(
+      `/passengers/myticket?busId=${bus.id}&from=${from}&to=${to}&date=${date}&passengers=${passengers}&price=${totalPrice}`
+    )
   }
 
-  if (passengers > bus.seats) {
-    alert("Not enough are available.")
-    return;
-  }
-
-  const totalPrice = bus.price * passengers
-
-  Router.push(`/ticket ? 
-    busId = ${bus.id} 
-    busTo = ${to}
-    busfrom = ${from}
-    busDate = ${date}
-    busPassengers = ${passengers}
-    busTotalPrice = ${totalPrice}
-  `)
-}
+  const busData = buses as { buses: Bus[] }
+  const allCities = Array.from(
+    new Set([
+      ...busData.buses.map((bus) => bus.from),
+      ...busData.buses.map((bus) => bus.to)
+    ])
+  )
 
   return (
     <div>
-      <input placeholder="From" onChange={(e) => setFrom(e.target.value)} />
-      <input placeholder="To" onChange={(e) => setTo(e.target.value)} />
-      <input type="date" onChange={(e) => setDate(e.target.value)} />
+      <select onChange={(e) => setFrom(e.target.value)}>
+        <option value="">Selet From</option>
+        {allCities.map((city) => (
+          <option value={city} key={city}>
+            {city}
+          </option>
+        ))}
+      </select>
 
-      <button onClick={handleSearch}>
+      <select onChange={(e) => setTo(e.target.value)}>
+        <option value="">Select To</option>
+        {allCities.filter((city) => city !== from).map((city) => (
+          <option value="city" key={city}>
+            {city}
+          </option>
+        ))}
+      </select>
+
+      <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+      <input type="number" min="1" value={passengers} onChange={(e) => setPassengers(Number(e.target.value))} placeholder="passengers Numbers" />
+
+      <button onClick={handleSearch} className="hover:Mouse=pointer">
         Search Buses
       </button>
 
@@ -139,12 +159,16 @@ const HandleBooking = (bus:Bus) => {
       {searchedResult && (
         <div>
           <h2>Available Buses</h2>
-          {filterBuses.length === 0 ? (
+          {filteredBuses.length === 0 ? (
             <p>No buses found </p>
-          ) : filterBuses.map((bus) => (
+          ) : filteredBuses.map((bus) => (
             <div key={bus.id}>
               <p>{bus.name}</p>
               <p>{bus.price}</p>
+
+              <button onClick={() => HandleBooking(bus)}>
+                Book now
+              </button>
             </div>
           ))
           }

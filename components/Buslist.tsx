@@ -10,7 +10,7 @@ export default function BusList() {
 
   return (
     <div className="flex flex-col gap-6">
-      {buses.map((bus) => (
+      {buses.buses.map((bus) => (
         <BusCard key={bus.id} bus={bus} from={from} to={to} />
       ))}
     </div>
