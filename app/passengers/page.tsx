@@ -150,30 +150,27 @@ export default function HeroSection() {
       <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
       <input type="number" min="1" value={passengers} onChange={(e) => setPassengers(Number(e.target.value))} placeholder="passengers Numbers" />
 
-      <button onClick={handleSearch} className="hover:Mouse=pointer">
-        Search Buses
-      </button>
-
       <p>{error}</p>
+      {searchedResult && filteredBuses.length === 0 && (
+        <p>No bus found</p>
+      )}
 
-      {searchedResult && (
+      {searchedResult && filteredBuses.length > 0 && (
         <div>
-          <h2>Available Buses</h2>
-          {filteredBuses.length === 0 ? (
-            <p>No buses found </p>
-          ) : filteredBuses.map((bus) => (
+          <h2>Available buses</h2>
+          {filteredBuses.map((bus) => (
             <div key={bus.id}>
               <p>{bus.name}</p>
               <p>{bus.price}</p>
 
-              <button onClick={() => HandleBooking(bus)}>
-                Book now
+              <button onClick={handleSearch} className="hover:Mouse=pointer">
+                Search Buses
               </button>
             </div>
-          ))
-          }
+          ))}
         </div>
       )}
+
     </div>
   )
 }
