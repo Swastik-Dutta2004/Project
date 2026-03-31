@@ -129,7 +129,7 @@ export default function HeroSection() {
 
   return (
     <div>
-      <select onChange={(e) => setFrom(e.target.value)}>
+      <select value={from} onChange={(e) => setFrom(e.target.value)}>
         <option value="">Selet From</option>
         {allCities.map((city) => (
           <option value={city} key={city}>
@@ -138,17 +138,22 @@ export default function HeroSection() {
         ))}
       </select>
 
-      <select onChange={(e) => setTo(e.target.value)}>
+      <select value={to} onChange={(e) => setTo(e.target.value)}>
         <option value="">Select To</option>
         {allCities.filter((city) => city !== from).map((city) => (
-          <option value="city" key={city}>
+          <option value={city} key={city}>
             {city}
           </option>
         ))}
       </select>
 
       <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-      <input type="number" min="1" value={passengers} onChange={(e) => setPassengers(Number(e.target.value))} placeholder="passengers Numbers" />
+      <input type="number" min="1" value={passengers} onChange={(e) => setPassengers(Number(e.target.value))}
+        placeholder="passengers Numbers" />
+
+      <button onClick={handleSearch} className="hover:cursor-pointer">
+        Search Buses
+      </button>
 
       <p>{error}</p>
       {searchedResult && filteredBuses.length === 0 && (
@@ -162,10 +167,8 @@ export default function HeroSection() {
             <div key={bus.id}>
               <p>{bus.name}</p>
               <p>{bus.price}</p>
+              <button onClick={() => HandleBooking(bus)}>Book now</button>
 
-              <button onClick={handleSearch} className="hover:Mouse=pointer">
-                Search Buses
-              </button>
             </div>
           ))}
         </div>
