@@ -1,6 +1,7 @@
 "use client"
 
-import React, { useState } from "react";
+import React from "react";
+import { MapPin, ArrowRight } from "lucide-react";
 
 const cards = [
   { id: 1, name: "Belur Math - Sacred Temple & Museum Tour", location: "Kolkata, India", rating: 4.8, reviews: 243, price: 120, days: 3, ima: "/cards/BelurMoth.jpg" },
@@ -17,9 +18,9 @@ const StarRating = ({ rating }: { rating: number }) => {
   const full = Math.floor(rating);
   const half = rating % 1 >= 0.5;
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: "2px" }}>
+    <div className="flex items-center gap-0.5">
       {Array.from({ length: 5 }).map((_, i) => (
-        <svg key={i} width="14" height="14" viewBox="0 0 24 24" fill={i < full ? "#F59E0B" : i === full && half ? "url(#half)" : "#D1D5DB"} xmlns="http://www.w3.org/2000/svg">
+        <svg key={i} className="w-3.5 h-3.5" viewBox="0 0 24 24" fill={i < full ? "#F59E0B" : i === full && half ? "url(#half)" : "#D1D5DB"} xmlns="http://www.w3.org/2000/svg">
           <defs>
             <linearGradient id="half">
               <stop offset="50%" stopColor="#F59E0B" />
@@ -34,121 +35,61 @@ const StarRating = ({ rating }: { rating: number }) => {
 };
 
 const Cards = () => {
-  const [hovered, setHovered] = useState<number | null>(null);
-
   return (
-    <div style={{
-      padding: "40px 48px",
-      background: "#F8F9FA",
-      fontFamily: "'DM Sans', 'Segoe UI', sans-serif",
-      minHeight: "100vh",
-    }}>
-
-      {/* Header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "28px" }}>
-        <h2 style={{ fontSize: "22px", fontWeight: 700, color: "#111827", margin: 0 }}>
-          Find Popular Tours
-        </h2>
-        <span style={{ fontSize: "14px", color: "#3B82F6", cursor: "pointer", fontWeight: 500 }}>
-          See all
-        </span>
-      </div>
-
-      {/* Grid */}
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(4, 1fr)",
-        gap: "20px",
-      }}>
+    <div className="w-full py-4">
+      {/* Grid Layout - Headings and Outer Padding Removed for Seamless Integration */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {cards.map((card) => (
           <div
             key={card.id}
-            onMouseEnter={() => setHovered(card.id)}
-            onMouseLeave={() => setHovered(null)}
-            style={{
-              background: "#fff",
-              borderRadius: "14px",
-              overflow: "hidden",
-              boxShadow: hovered === card.id
-                ? "0 8px 30px rgba(0,0,0,0.13)"
-                : "0 2px 10px rgba(0,0,0,0.07)",
-              transition: "box-shadow 0.25s ease, transform 0.25s ease",
-              transform: hovered === card.id ? "translateY(-4px)" : "translateY(0)",
-              cursor: "pointer",
-            }}
+            className="group bg-card rounded-2xl overflow-hidden border border-border shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer"
           >
-            {/* Image — full, no crop */}
-            <div style={{ width: "100%", aspectRatio: "4/3", overflow: "hidden" }}>
+            {/* Image Container */}
+            <div className="relative aspect-[4/3] overflow-hidden">
               <img
                 src={card.ima}
                 alt={card.name}
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  objectPosition: "center",
-                  display: "block",
-                  transition: "transform 0.4s ease",
-                  transform: hovered === card.id ? "scale(1.05)" : "scale(1)",
-                }}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
               />
+              <div className="absolute top-3 left-3 bg-background/90 backdrop-blur-md px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest text-foreground shadow-sm">
+                Live Tracking
+              </div>
             </div>
 
-            {/* Card Body */}
-            <div style={{ padding: "14px 16px 16px" }}>
-
-              {/* Location */}
-              <div style={{ display: "flex", alignItems: "center", gap: "4px", marginBottom: "6px" }}>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                  <circle cx="12" cy="10" r="3" />
-                </svg>
-                <span style={{ fontSize: "12px", color: "#6B7280", fontWeight: 500 }}>{card.location}</span>
+            {/* Card Content */}
+            <div className="p-5">
+              {/* Location Tag */}
+              <div className="flex items-center gap-1.5 mb-2">
+                <MapPin size={12} className="text-primary" />
+                <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
+                  {card.location}
+                </span>
               </div>
 
-              {/* Title */}
-              <h3 style={{
-                fontSize: "14px",
-                fontWeight: 600,
-                color: "#111827",
-                margin: "0 0 8px",
-                lineHeight: "1.4",
-                display: "-webkit-box",
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: "vertical",
-                overflow: "hidden",
-              }}>
+              {/* Title - Set to font-black for BusTiFY branding */}
+              <h3 className="text-sm font-black text-foreground leading-tight mb-2 line-clamp-2 min-h-[40px] group-hover:text-primary transition-colors uppercase tracking-tight">
                 {card.name}
               </h3>
 
-              {/* Rating */}
-              <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "12px" }}>
+              {/* Rating Row */}
+              <div className="flex items-center gap-2 mb-4">
                 <StarRating rating={card.rating} />
-                <span style={{ fontSize: "12px", fontWeight: 600, color: "#374151" }}>{card.rating}</span>
-                <span style={{ fontSize: "12px", color: "#9CA3AF" }}>({card.reviews})</span>
+                <span className="text-xs font-black text-foreground">{card.rating}</span>
+                <span className="text-[10px] font-bold text-muted-foreground uppercase">({card.reviews} reviews)</span>
               </div>
 
-              {/* Divider */}
-              <div style={{ borderTop: "1px solid #F3F4F6", marginBottom: "12px" }} />
+              <div className="h-[1px] w-full bg-border mb-4" />
 
-              {/* Footer */}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                {/* <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                    <line x1="16" y1="2" x2="16" y2="6" />
-                    <line x1="8" y1="2" x2="8" y2="6" />
-                    <line x1="3" y1="10" x2="21" y2="10" />
-                  </svg>
-                  <span style={{ fontSize: "13px", color: "#6B7280" }}>
-                    {card.days} {card.days === 1 ? "day" : "days"}
-                  </span>
-                </div> */}
-                {/* <span style={{ fontSize: "15px", fontWeight: 700, color: "#111827" }}>
-                  ${card.price}
-                </span> */}
+              {/* Price & Action Button */}
+              <div className="flex justify-between items-center">
+                <div>
+                  <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest block leading-none mb-1">Fare From</span>
+                  <span className="text-xl font-black text-foreground">₹{card.price}</span>
+                </div>
+                <div className="bg-secondary text-secondary-foreground p-2.5 rounded-xl group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300 group-hover:rotate-6">
+                  <ArrowRight size={18} />
+                </div>
               </div>
-
             </div>
           </div>
         ))}
