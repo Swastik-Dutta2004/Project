@@ -1,7 +1,7 @@
 "use client"
 
 import { getBuses, savedBuses } from "@/lib/busStorage"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 export default function ConductorPage() {
     const [name, setName] = useState("")
@@ -9,6 +9,7 @@ export default function ConductorPage() {
     const [to, setTo] = useState("")
     const [price, setPrice] = useState("")
     const [seats, setSeats] = useState("")
+    const [buslist, setBuslist] = useState<any[]>([])
 
     const handleAddBus = () => {
         const existing = getBuses()
@@ -28,17 +29,30 @@ export default function ConductorPage() {
             amenities: []
         }
 
-        const update = [...existing, newBus]
-        savedBuses(update)
+        const updated = [...existing, newBus]
+        savedBuses(updated)
 
         alert("Bus add sucessfully👍")
 
         setName(""),
-        setFrom(""),
-        setTo(""),
-        setPrice(""),
-        setSeats("")
+            setFrom(""),
+            setTo(""),
+            setPrice(""),
+            setSeats("")
     }
+
+    useEffect(() => {
+        const data = getBuses()
+        setBuslist(data)
+    }, [])
+
+
+    const handleDelete = (id: number) => {
+        const updated = buslist.filter((bus) => bus.id !== id)
+        setBuslist(updated)
+        savedBuses(updated)
+    }
+
 
     return (
         <div>
@@ -53,6 +67,21 @@ export default function ConductorPage() {
             <button onClick={handleAddBus}>
                 Add Bus
             </button>
+
+            <h2>All buses</h2>
+
+            {buslist.length === 0 ? (
+                <p>No available buses</p>
+            ) : (
+                buslist.map((bus) =>
+                    <div key={bus.id}>
+                        <p>{bus.name}</p>
+                        <p>{bus.from} → {bus.to}</p>
+                        <p>₹{bus.price}</p>
+                        <p>Seats: {bus.seats}</p>
+                    </div>
+                )
+            )}
         </div>
     )
 }
