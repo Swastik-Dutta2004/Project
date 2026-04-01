@@ -129,3 +129,11 @@
     scrollbar-width: none;
   }
 } 
+
+body {
+  background: linear-gradient(
+    135deg,
+    oklch(0.97 0.02 85),
+    oklch(0.94 0.03 25)
+  );
+}
