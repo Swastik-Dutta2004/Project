@@ -1,10 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { getBuses } from "@/lib/busStorage"
 import buses from "@/public/buses.json"
 import { useRouter } from "next/navigation"
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
+import { json } from "stream/consumers"
 
 // Interface definitions kept for type safety
 interface SearchResult {
@@ -52,12 +54,21 @@ export default function HeroSection() {
     setSearchedResult({ from, to, passengers, date })
   }
 
-  const busData = buses as { buses: Bus[] }
-  const allCities = Array.from(new Set([...busData.buses.map((bus) => bus.from), ...busData.buses.map((bus) => bus.to)]))
 
-  const filteredBuses = searchedResult ? busData.buses.filter((bus) => {
+  const [buslist, setBuslist] = useState<Bus[]>([])  
+
+  useEffect(() =>{
+    const data = getBuses()
+    const Json = buses.buses
+    setBuslist([...data, ...Json])
+  }, [])
+
+  const busData = buses as { buses: Bus[] }
+  const allCities = Array.from(new Set([...buslist.map((bus) => bus.from), ...buslist.map((bus) => bus.to)]))
+
+  const filteredBuses = searchedResult ? buslist.filter((bus) => {
     return (
-      bus.from?.toLowerCase() === from.toLowerCase() &&
+      bus.from?.toLowerCase() === from.toLowerCase() && 
       bus.to?.toLowerCase() === to.toLowerCase()
     )
   }) : []
