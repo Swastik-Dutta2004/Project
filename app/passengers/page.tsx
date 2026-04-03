@@ -181,9 +181,9 @@ export default function HeroSection() {
                 {filteredBuses.map((bus) => (
                   <div key={bus.id} className="group bg-card border border-border p-5 rounded-2xl flex flex-col md:flex-row justify-between items-center hover:border-primary/50 hover:shadow-xl transition-all duration-300">
                     <div className="flex items-center gap-5 w-full md:w-auto">
-                      <div className="w-14 h-14 bg-secondary rounded-xl flex items-center justify-center text-primary font-black text-xl group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                      {/* <div className="w-14 h-14 bg-secondary rounded-xl flex items-center justify-center text-primary font-black text-xl group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
                         {bus.id}
-                      </div>
+                      </div> */}
                       <div>
                         <h3 className="font-bold text-foreground text-lg leading-none mb-1">{bus.name}</h3>
                         <div className="flex gap-2">
