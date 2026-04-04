@@ -1,41 +1,47 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import bcrypt from "bcrypt"
 
 export async function POST(req: Request) {
   try {
-    const text = await req.text();
 
-    if (!text) {
-      return NextResponse.json({ error: "No data provided" });
+    // Get body
+    const body = await req.json()
+
+    //Validation Check
+    if (!body.email || !body.password || !body.name) {
+      return NextResponse.json({error: "All fields are required."})
     }
 
-    const body = JSON.parse(text);
-
+    //check existing user
     const existingUser = await prisma.user.findUnique({
-      where: { email: body.email },
-    });
-
+      where: { email: body.email }
+    })
     if (existingUser) {
-      return NextResponse.json({ error: "User already exists" });
+      return NextResponse.json({ error: "User already exists." })
     }
 
-    const user = await prisma.user.create({
+    //Hash password
+    const hashedPassword = await bcrypt.hash(body.password, 10)
+
+    //Create user
+    const createUser = await prisma.user.create({
       data: {
         name: body.name,
         email: body.email,
-        password: body.password,
-        role: "passenger",
-      },
-    });
+        password: hashedPassword,
+        role: "passenger"
+      }
+    })
 
-    return NextResponse.json(user);
+    // Return User data
+    return NextResponse.json(createUser)
+
   } catch (error: any) {
-    console.error(error);
-
     if (error.code === "P2002") {
-      return NextResponse.json({ error: "Email already exists" });
+      return NextResponse.json({error: "Email already exists."})
     }
 
-    return NextResponse.json({ error: "Something went wrong" });
+    return NextResponse.json({error: "Something went wrong."})
   }
 }
