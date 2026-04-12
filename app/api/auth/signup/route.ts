@@ -10,7 +10,7 @@ export async function POST(req: Request) {
 
     //Validation Check
     if (!body.email || !body.password || !body.name) {
-      return NextResponse.json({error: "All fields are required."})
+      return NextResponse.json({ error: "All fields are required." })
     }
 
     //check existing user
@@ -35,13 +35,18 @@ export async function POST(req: Request) {
     })
 
     // Return User data
-    return NextResponse.json(createUser)
+    return NextResponse.json({
+      id: createUser.id,
+      name: createUser.name,
+      email: createUser.email
+    });
 
+    
   } catch (error: any) {
     if (error.code === "P2002") {
-      return NextResponse.json({error: "Email already exists."})
+      return NextResponse.json({ error: "Email already exists." })
     }
 
-    return NextResponse.json({error: "Something went wrong."})
+    return NextResponse.json({ error: "Something went wrong." })
   }
 }
