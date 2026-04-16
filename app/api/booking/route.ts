@@ -1,42 +1,50 @@
 import { NextResponse } from "next/server";
-import Jwt from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/prisma";
 
-export async function POST(req:Request) {
+export async function POST(req: Request) {
     try {
         const authHeader = req.headers.get("authorization")
 
         if (!authHeader) {
-            return NextResponse.json({error: "No token provided"})
+            return NextResponse.json({ error: "No token provided" })
         }
 
-        const token = authHeader.split("")[1];
+        const token = authHeader.split(" ")[1];
 
-        const decode =  Jwt.verify(token, process.env.JWT_SECRET!) as {
-            userID : number;
+        console.log("TOKEN PARTS:", authHeader.split(" "));
+        console.log("TOKEN:", JSON.stringify(token));
+        console.log("STARTS WITH eyJ?", token?.startsWith("eyJ"));
+
+        const decode = jwt.verify(token, process.env.JWT_SECRET!) as {
+            userId: number;
             email: string;
         }
+
+        console.log("AUTH HEADER:", authHeader);
+        console.log("TOKEN:", token);
+        console.log("TOKEN LENGTH:", token?.length);
 
         const body = await req.json();
 
         if (!body.busId || !body.seatId) {
-            return NextResponse.json({error: "BusID and SeatID is required"})
+            return NextResponse.json({ error: "BusID and SeatID is required" })
         }
 
         const exixtingBooking = await prisma.booking.findFirst({
             where: {
-                busId : body.busId,
-                seatId : body.seatId
+                busId: body.busId,
+                seatId: body.seatId
             }
         })
 
         if (exixtingBooking) {
-            return NextResponse.json({error: "Seat is alreay booked"})
+            return NextResponse.json({ error: "Seat is alreay booked" })
         }
 
         const booking = await prisma.booking.create({
-            data:{
-                userId: decode.userID,
+            data: {
+                userId: decode.userId,
                 seatId: body.seatId,
                 busId: body.busId
             }
@@ -46,8 +54,17 @@ export async function POST(req:Request) {
             message: "Booking successful",
             booking
         })
-        
+
     } catch (error) {
-        return NextResponse.json({error: "Invlid Token"})
+        if (error instanceof jwt.JsonWebTokenError) {
+            console.log("JWT verification failed:", error.message);
+            return NextResponse.json({ error: "Invalid Token: " + error.message });
+        }
+        if (error instanceof jwt.TokenExpiredError) {
+            return NextResponse.json({ error: "Token expired" });
+        }
+        console.log("OTHER ERROR:", error);
+        return NextResponse.json({ error: "Something went wrong" });
+
     }
 }
