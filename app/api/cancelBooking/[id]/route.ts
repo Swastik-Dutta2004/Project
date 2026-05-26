@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import Jwt, { JsonWebTokenError } from "jsonwebtoken";
 import { prisma } from "@/lib/prisma";
     
-export async function DELETE(req:NextRequest, {params} : {params: {id : String}}) {
+export async function DELETE(req:NextRequest, context: { params: Promise<{ id: string }> }) {
     try {
         
-        const authHeader = req.headers.get("authentication")
+        const authHeader = req.headers.get("authorization")
 
         if (!authHeader) {
             return NextResponse.json(
@@ -24,6 +24,7 @@ export async function DELETE(req:NextRequest, {params} : {params: {id : String}}
             email: string
         }
 
+        const params = await context.params
         const bookingId = Number(params.id)
 
         if (!bookingId) {
