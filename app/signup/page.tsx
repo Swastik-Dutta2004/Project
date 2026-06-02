@@ -12,13 +12,13 @@ export default function SignupPage() {
 
     const [loading, setLoading] = useState(false);
 
-    async function handleSignup(e: React.FormEvent) {
+    async function handleSignup(e: any) {
         e.preventDefault();
 
         try {
             setLoading(true);
 
-            const res = await fetch("/api/signup", {
+            const res = await fetch("/api/auth/signup", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -40,6 +40,7 @@ export default function SignupPage() {
             alert("Signup successful");
 
             router.push("/login");
+
         } catch (error) {
             console.log(error);
             alert("Something went wrong");
