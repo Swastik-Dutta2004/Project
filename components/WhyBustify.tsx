@@ -1,66 +1,103 @@
-"use client"
+"use client";
 
-import React from 'react'
+import React from "react";
+import { Zap, Tag, ShieldCheck, Headphones } from "lucide-react";
+
+const features = [
+  {
+    no: "01",
+    icon: <Zap className="w-5 h-5" />,
+    title: "Book in 12 seconds",
+    desc: "Search, pick a seat, pay. No paperwork, no queues, no 'system down' signs.",
+    foot: "Avg. checkout time, Q1 2025",
+  },
+  {
+    no: "02",
+    icon: <Tag className="w-5 h-5" />,
+    title: "Fares that make sense",
+    desc: "Standardized pricing across operators, plus student and senior concessions built in.",
+    foot: "From ₹8 · no surge pricing",
+  },
+  {
+    no: "03",
+    icon: <ShieldCheck className="w-5 h-5" />,
+    title: "Verified operators",
+    desc: "Every bus, every conductor, every route is KYC-verified. We know who's driving.",
+    foot: "100% operator KYC, 2024–",
+  },
+  {
+    no: "04",
+    icon: <Headphones className="w-5 h-5" />,
+    title: "A real human, 24/7",
+    desc: "Missed your stop? Wrong charge? Talk to a person in under 90 seconds — not a bot.",
+    foot: "Median pickup: 47 sec",
+  },
+];
 
 const WhyBustify = () => {
-    const features = [
-        {
-            title: "Easy & Fast Booking",
-            desc: "Passengers can quickly search buses, compare options, and book tickets within seconds.",
-            icon: "/images/tickets.svg",
-        },
-        {
-            title: "Affordable Prices",
-            desc: "BusTiFY offers competitive ticket prices and special discounts for the best deals.",
-            icon: "/images/prices.svg",
-        },
-        {
-            title: "Safe & Reliable Travel",
-            desc: "All buses and operators are verified to ensure passenger safety and comfort.",
-            icon: "/images/health.svg",
-        },
-        {
-            title: "24/7 Customer Support",
-            desc: "Our support team is always available to help with bookings and travel assistance.",
-            icon: "/images/everyTime.svg",
-        },
-    ];
-
-    return (
-        <section className="py-6 bg-background">
-            {/* Features Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {features.map((feature, index) => (
-                    <div 
-                        key={index} 
-                        className="group relative p-8 rounded-2xl border border-border bg-card hover:border-primary/50 transition-all duration-300 overflow-hidden"
-                    >
-                        {/* Decorative background element */}
-                        <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full group-hover:scale-150 transition-transform duration-500" />
-
-                        <div className="relative z-10 flex flex-col items-center text-center">
-                            {/* Icon Container */}
-                            <div className="mb-6 p-4 rounded-2xl bg-secondary group-hover:bg-primary group-hover:rotate-6 transition-all duration-300">
-                                <img 
-                                    src={feature.icon} 
-                                    alt={feature.title} 
-                                    className="w-10 h-10 group-hover:brightness-0 group-hover:invert transition-all" 
-                                />
-                            </div>
-
-                            <h3 className="text-lg font-bold text-foreground mb-3 leading-tight">
-                                {feature.title}
-                            </h3>
-                            
-                            <p className="text-sm text-muted-foreground leading-relaxed">
-                                {feature.desc}
-                            </p>
-                        </div>
-                    </div>
-                ))}
+  return (
+    <section id="why" className="px-5 md:px-10 py-16 md:py-24">
+      <div className="mx-auto max-w-[1400px]">
+        {/* Section header — editorial */}
+        <div className="grid grid-cols-12 gap-8 mb-12 md:mb-16 items-end">
+          <div className="col-span-12 md:col-span-7">
+            <div className="flex items-center gap-3 mb-5">
+              <span className="route-num text-2xl text-tram">§ 02</span>
+              <span className="mono text-[10px] tracking-[0.3em] uppercase text-muted-foreground">
+                The Manifest
+              </span>
             </div>
-        </section>
-    )
-}
+            <h2 className="display text-5xl md:text-7xl lg:text-[88px] leading-[0.95] tracking-tight text-ink">
+              Why <span className="italic font-light">Kolkata</span>{" "}
+              <br className="hidden md:block" />
+              rides with us.
+            </h2>
+          </div>
+          <div className="col-span-12 md:col-span-5">
+            <p className="text-lg text-ink/80 leading-relaxed">
+              BusTiFY is built for the city, by people who grew up arguing with conductors
+              about change. Four promises we keep — every trip, every day.
+            </p>
+          </div>
+        </div>
 
-export default WhyBustify
+        {/* Features grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-border rounded-2xl overflow-hidden border border-border">
+          {features.map((f, i) => (
+            <article
+              key={i}
+              className="group relative bg-paper p-7 md:p-8 hover:bg-ink hover:text-paper transition-colors duration-500 min-h-[300px] flex flex-col"
+            >
+              <div className="flex items-start justify-between mb-8">
+                <span className="route-num text-5xl text-tram group-hover:text-tram transition-colors">
+                  {f.no}
+                </span>
+                <div className="w-10 h-10 grid place-items-center rounded-full border border-current/30 group-hover:border-paper/30 group-hover:bg-paper/10 transition-all">
+                  {f.icon}
+                </div>
+              </div>
+
+              <h3 className="display text-2xl md:text-[28px] leading-tight mb-3 tracking-tight">
+                {f.title}
+              </h3>
+              <p className="text-sm md:text-[15px] leading-relaxed opacity-80 flex-1">
+                {f.desc}
+              </p>
+
+              <div className="mt-6 pt-5 border-t border-current/15 flex items-center justify-between">
+                <span className="mono text-[10px] tracking-[0.2em] uppercase opacity-60">
+                  {f.foot}
+                </span>
+                <span className="mono text-xs opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all">
+                  →
+                </span>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default WhyBustify;

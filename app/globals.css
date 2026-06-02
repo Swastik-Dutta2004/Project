@@ -7,8 +7,10 @@
   @theme inline {
     --color-background: var(--background);
     --color-foreground: var(--foreground);
-    --font-sans: var(--font-sans);
-    --font-mono: var(--font-geist-mono);
+    --font-sans: var(--font-geist-sans);
+    --font-mono: var(--font-jetbrains);
+    --font-display: var(--font-fraunces);
+    --font-route: var(--font-bebas);
     --color-sidebar-ring: var(--sidebar-ring);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -38,6 +40,11 @@
     --color-popover: var(--popover);
     --color-card-foreground: var(--card-foreground);
     --color-card: var(--card);
+    --color-ink: var(--ink);
+    --color-paper: var(--paper);
+    --color-tram: var(--tram);
+    --color-howrah: var(--howrah);
+    --color-volt: var(--volt);
     --radius-sm: calc(var(--radius) * 0.6);
     --radius-md: calc(var(--radius) * 0.8);
     --radius-lg: var(--radius);
@@ -45,64 +52,89 @@
     --radius-2xl: calc(var(--radius) * 1.8);
     --radius-3xl: calc(var(--radius) * 2.2);
     --radius-4xl: calc(var(--radius) * 2.6);
-    --font-heading: var(--font-sans);
+    --font-heading: var(--font-fraunces);
   }
 
-  
+
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
+    /* Warm paper / ink palette — Kolkata Transit Editorial */
+    --background: oklch(0.972 0.012 82);
+    --foreground: oklch(0.18 0.012 60);
+    --paper: oklch(0.972 0.012 82);
+    --ink: oklch(0.18 0.012 60);
+
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.18 0.012 60);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.18 0.012 60);
+
+    --primary: oklch(0.18 0.012 60);
+    --primary-foreground: oklch(0.972 0.012 82);
+
+    --secondary: oklch(0.94 0.012 78);
+    --secondary-foreground: oklch(0.22 0.012 60);
+
+    --muted: oklch(0.93 0.01 78);
+    --muted-foreground: oklch(0.48 0.012 60);
+
+    /* Tram-ticket mustard accent */
+    --accent: oklch(0.82 0.135 78);
+    --accent-foreground: oklch(0.18 0.012 60);
+    --tram: oklch(0.82 0.135 78);
+
+    /* Howrah bridge red — used sparingly */
+    --destructive: oklch(0.52 0.205 25);
+    --destructive-foreground: oklch(0.985 0.005 85);
+    --howrah: oklch(0.52 0.205 25);
+
+    /* Electric route line (subtle UI signal) */
+    --volt: oklch(0.72 0.18 50);
+
+    --border: oklch(0.86 0.012 70);
+    --input: oklch(0.86 0.012 70);
+    --ring: oklch(0.82 0.135 78);
+
     --radius: 0.5rem;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+
+    /* Distinctive chart palette */
+    --chart-1: oklch(0.62 0.20 35);   /* terracotta */
+    --chart-2: oklch(0.72 0.15 145);  /* leaf */
+    --chart-3: oklch(0.55 0.18 270);  /* deep blue */
+    --chart-4: oklch(0.78 0.16 75);   /* mustard */
+    --chart-5: oklch(0.45 0.18 320);  /* aubergine */
   }
 
   .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    --background: oklch(0.16 0.012 60);
+    --foreground: oklch(0.96 0.012 82);
+    --paper: oklch(0.18 0.012 60);
+    --ink: oklch(0.96 0.012 82);
+    --card: oklch(0.21 0.012 60);
+    --card-foreground: oklch(0.96 0.012 82);
+    --popover: oklch(0.21 0.012 60);
+    --popover-foreground: oklch(0.96 0.012 82);
+    --primary: oklch(0.96 0.012 82);
+    --primary-foreground: oklch(0.18 0.012 60);
+    --secondary: oklch(0.26 0.012 60);
+    --secondary-foreground: oklch(0.96 0.012 82);
+    --muted: oklch(0.26 0.012 60);
+    --muted-foreground: oklch(0.65 0.012 60);
+    --accent: oklch(0.78 0.14 78);
+    --accent-foreground: oklch(0.18 0.012 60);
+    --tram: oklch(0.78 0.14 78);
+    --destructive: oklch(0.55 0.20 25);
+    --destructive-foreground: oklch(0.96 0.012 82);
+    --howrah: oklch(0.62 0.20 25);
+    --volt: oklch(0.75 0.16 50);
+    --border: oklch(0.30 0.012 60);
+    --input: oklch(0.30 0.012 60);
+    --ring: oklch(0.78 0.14 78);
+    --chart-1: oklch(0.70 0.18 35);
+    --chart-2: oklch(0.75 0.14 145);
+    --chart-3: oklch(0.65 0.16 270);
+    --chart-4: oklch(0.80 0.14 75);
+    --chart-5: oklch(0.62 0.16 320);
   }
 }
 
@@ -113,27 +145,169 @@
     }
     body {
       @apply bg-background text-foreground;
+      background:
+        radial-gradient(1200px 600px at 80% -10%, oklch(0.82 0.135 78 / 0.18), transparent 60%),
+        radial-gradient(900px 500px at -10% 30%, oklch(0.62 0.20 35 / 0.08), transparent 55%),
+        linear-gradient(180deg, oklch(0.985 0.008 85), oklch(0.96 0.014 78));
+      background-attachment: fixed;
     }
     html {
       @apply font-sans;
     }
   }
 
-  /* Add this to your global CSS if you haven't */
-@layer utilities {
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-} 
+  @layer utilities {
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-body {
-  background: linear-gradient(
-    135deg,
-    oklch(0.97 0.02 85),
-    oklch(0.94 0.03 25)
-  );
-}
+    /* ── Paper grain (subtle texture overlay) ─────────────────────── */
+    .paper-grain {
+      position: relative;
+      isolation: isolate;
+    }
+    .paper-grain::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.35;
+      mix-blend-mode: multiply;
+      background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.10  0 0 0 0 0.08  0 0 0 0 0.06  0 0 0 0.45 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    }
+    .paper-grain > * { position: relative; z-index: 1; }
+
+    /* ── Ticket perforation edges ───────────────────────────────── */
+    .ticket-perf {
+      -webkit-mask-image: radial-gradient(circle 6px at 0 50%, transparent 98%, #000 100%),
+                         radial-gradient(circle 6px at 100% 50%, transparent 98%, #000 100%);
+      mask-image: radial-gradient(circle 6px at 0 50%, transparent 98%, #000 100%),
+                  radial-gradient(circle 6px at 100% 50%, transparent 98%, #000 100%);
+    }
+
+    .perf-divider {
+      background-image: radial-gradient(circle, var(--border) 1px, transparent 1.5px);
+      background-size: 8px 8px;
+      background-repeat: repeat-y;
+      background-position: center;
+    }
+
+    /* ── Ticket dashed divider ──────────────────────────────────── */
+    .ticket-stitch {
+      background-image: linear-gradient(90deg, var(--border) 50%, transparent 50%);
+      background-size: 10px 1.5px;
+      background-repeat: repeat-x;
+      background-position: center;
+    }
+    .ticket-stitch-v {
+      background-image: linear-gradient(180deg, var(--border) 50%, transparent 50%);
+      background-size: 1.5px 10px;
+      background-repeat: repeat-y;
+      background-position: center;
+    }
+
+    /* ── Stamp circle (for ticket seals) ────────────────────────── */
+    .stamp {
+      border: 1.5px dashed currentColor;
+      border-radius: 9999px;
+      padding: 0.25rem 0.6rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-family: var(--font-jetbrains), ui-monospace, monospace;
+      font-size: 9px;
+      font-weight: 600;
+    }
+
+    /* ── Marquee for live ticker ────────────────────────────────── */
+    .marquee {
+      animation: marquee 40s linear infinite;
+    }
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ── Animated route pulse ───────────────────────────────────── */
+    .route-pulse {
+      position: relative;
+    }
+    .route-pulse::after {
+      content: "";
+      position: absolute;
+      width: 10px; height: 10px;
+      border-radius: 9999px;
+      background: var(--accent);
+      box-shadow: 0 0 0 0 oklch(0.82 0.135 78 / 0.7);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 oklch(0.82 0.135 78 / 0.55); }
+      70% { box-shadow: 0 0 0 16px oklch(0.82 0.135 78 / 0); }
+      100% { box-shadow: 0 0 0 0 oklch(0.82 0.135 78 / 0); }
+    }
+
+    /* ── Staggered reveal on page load ──────────────────────────── */
+    .reveal { opacity: 0; transform: translateY(14px); animation: reveal 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) forwards; }
+    .reveal-1 { animation-delay: 0.05s; }
+    .reveal-2 { animation-delay: 0.15s; }
+    .reveal-3 { animation-delay: 0.25s; }
+    .reveal-4 { animation-delay: 0.35s; }
+    .reveal-5 { animation-delay: 0.45s; }
+    .reveal-6 { animation-delay: 0.55s; }
+    @keyframes reveal {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Marquee blinking dot ───────────────────────────────────── */
+    .blink {
+      animation: blink 1.4s ease-in-out infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.35; }
+    }
+
+    /* ── Editorial big numerals (Bebas Neue) ────────────────────── */
+    .route-num {
+      font-family: var(--font-bebas), "Arial Narrow", sans-serif;
+      letter-spacing: 0.02em;
+      font-feature-settings: "tnum" 1;
+    }
+
+    /* ── Display serif (Fraunces) ───────────────────────────────── */
+    .display {
+      font-family: var(--font-fraunces), "Times New Roman", serif;
+      font-feature-settings: "ss01", "ss02";
+      font-variation-settings: "SOFT" 30, "WONK" 0, "opsz" 144;
+    }
+    .display-wonky {
+      font-family: var(--font-fraunces), "Times New Roman", serif;
+      font-variation-settings: "SOFT" 60, "WONK" 1, "opsz" 144;
+    }
+
+    /* ── Mono labels ────────────────────────────────────────────── */
+    .mono {
+      font-family: var(--font-jetbrains), ui-monospace, monospace;
+      font-feature-settings: "ss02" 1, "tnum" 1;
+    }
+
+    /* ── Editorial hairline ─────────────────────────────────────── */
+    .hairline { box-shadow: inset 0 0 0 1px var(--border); }
+
+    /* ── Card hover lift ────────────────────────────────────────── */
+    .lift { transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease; }
+    .lift:hover { transform: translateY(-4px); }
+
+    /* ── Tram yellow highlight (ink highlighter) ────────────────── */
+    .highlight {
+      background: linear-gradient(180deg, transparent 60%, oklch(0.82 0.16 78 / 0.55) 60%);
+      padding: 0 0.1em;
+    }
+
+    /* ── Print rules for tickets ────────────────────────────────── */
+    @media print {
+      .no-print { display: none !important; }
+    }
+  }
+
+  /* body background moved into @layer base above */
