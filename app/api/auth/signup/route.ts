@@ -10,17 +10,23 @@ export async function POST(req: Request) {
 
     //Validation Check
     if (!body.email || !body.password || !body.name) {
-      return NextResponse.json({ error: "All fields are required." })
+      return NextResponse.json(
+        { error: "All fields are required." },
+        { status: 400 }
+      )
     }
 
     //check existing user
     const existingUser = await prisma.user.findUnique({
-      where: {
+      where: {      
         email: body.email
       }
     })
     if (existingUser) {
-      return NextResponse.json({ error: "User already exists." })
+      return NextResponse.json(
+        { error: "User already exists." },
+        {status: 400}
+      )
     }
 
     //Hash password
@@ -46,9 +52,15 @@ export async function POST(req: Request) {
 
   } catch (error: any) {
     if (error.code === "P2002") {
-      return NextResponse.json({ error: "Email already exists." })
+      return NextResponse.json(
+        { error: "Email already exists." },
+        {status: 400}
+      )
     }
 
-    return NextResponse.json({ error: "Something went wrong." })
+    return NextResponse.json(
+      { error: "Something went wrong." },
+      {status: 500}
+    )
   }
 }

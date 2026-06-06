@@ -1,0 +1,60 @@
+import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
+import jwt from "jsonwebtoken"
+
+export async function GET(req: NextRequest) {
+    try {
+        const authHeader = req.headers.get("authorization")
+
+        if (!authHeader) {
+            return NextResponse.json(
+                { error: "No token provided." },
+                { status: 400 }
+            )
+        }
+
+        const token = authHeader.split(" ")[1]
+
+        jwt.verify(
+            token,
+            process.env.JWT_SECRET!
+        )
+
+        const from = req.nextUrl.searchParams.get("fromCity")
+        const to = req.nextUrl.searchParams.get("toCity")
+
+        if (!from || !to) {
+            return NextResponse.json(
+                { error: "From and To are required" },
+                { status: 400 }
+            );
+        }
+
+        const buses = await prisma.bus.findMany({
+            where: {
+                fromCity: from,
+                toCity: to
+            }, select: {
+                busName: true,
+                fromCity: true,
+                toCity: true
+            }
+        })
+
+        return NextResponse.json({
+            message: "Find successfully.",
+            buses
+        })
+    } catch (error) {
+        if (error instanceof jwt.JsonWebTokenError) {
+            return NextResponse.json(
+                { error: "Invaild token." },
+                { status: 403 }
+            )
+        }
+        return NextResponse.json(
+            { error: "Something went wrong." },
+            { status: 500 }
+        )
+    }
+}

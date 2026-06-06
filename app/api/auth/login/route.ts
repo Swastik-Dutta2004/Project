@@ -8,17 +8,20 @@ export async function POST(req: Request) {
         const body = await req.json()
 
         if (!body.email || !body.password) {
-            return NextResponse.json({ error: "All fields are required." })
+            return NextResponse.json({ error: "All fields are required." },
+                {status: 400}
+            )
         }
 
         const user = await prisma.user.findUnique({
             where: {
-                email: body.email
+                email: body.email 
             }
         })
 
         if (!user) {
-            return NextResponse.json({ error: "Users not found." })
+            return NextResponse.json({ error: "Users not found." },
+                {status: 400})
         }
 
         const isMatch = await bcrypt.compare(body.password, user.password)
@@ -27,7 +30,8 @@ export async function POST(req: Request) {
         console.log("Stored:", user.password);
 
         if (!isMatch) {
-            return NextResponse.json({ error: "Inavaild password." })
+            return NextResponse.json({ error: "Inavaild password." },
+                {status: 400}   )
         }
 
         const token = jwt.sign(
@@ -37,7 +41,7 @@ export async function POST(req: Request) {
                 role: user.role
             },  
             
-            process.env.JWT_SECRET!,
+            process.env.JWT_SECRET!,    
             { expiresIn: "1d" }
         );
 

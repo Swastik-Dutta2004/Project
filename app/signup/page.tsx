@@ -23,7 +23,7 @@ export default function SignupPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        alert(data.message);
+        alert(data.error);
         return;
       }
       alert("Welcome to BusTiFY. Your first ticket is on us.");

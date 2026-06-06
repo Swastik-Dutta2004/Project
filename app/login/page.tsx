@@ -28,9 +28,9 @@ export default function LoginPage() {
       }
       localStorage.setItem("token", data.token);
       alert("Welcome back to BusTiFY.");
-      router.push("/");
+      router.push("/"); 
     } catch (error) {
-      console.error(error);
+      console.error(error);   
       alert("Something went wrong");
     } finally {
       setLoading(false);

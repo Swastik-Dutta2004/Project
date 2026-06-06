@@ -1,10 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { getBuses } from "@/lib/busStorage"
-import buses from "@/public/buses.json"
 import { useRouter } from "next/navigation"
-import { ArrowRight, Search as SearchIcon, MapPin, Calendar, Users, ArrowUpRight, Bus, Clock } from "lucide-react"
+import { ArrowRight, Search as SearchIcon, MapPin, Calendar, Users, ArrowUpRight, Bus, Clock, Loader2 } from "lucide-react"
 
 interface SearchResult {
   from: string
@@ -24,8 +22,8 @@ interface Bus {
   price: number
   rating: number
   amenities: string[]
-  from: string
-  to: string
+  fromCity: string
+  toCity: string
 }
 
 export default function PassengersPage() {
@@ -35,9 +33,46 @@ export default function PassengersPage() {
   const [passengers, setPassengers] = useState(1)
   const [searchedResult, setSearchedResult] = useState<SearchResult | null>(null)
   const [error, setError] = useState("")
+  const [buslist, setBuslist] = useState<Bus[]>([])
+  const [allCities, setAllCities] = useState<string[]>([])
+  const [loading, setLoading] = useState(false)
   const router = useRouter()
 
-  const handleSearch = () => {
+  // Fetch all cities on mount for the dropdowns
+  useEffect(() => {
+    async function fetchAllCities() {
+      try {
+        const res = await fetch("/api/buses/cities")
+        if (!res.ok) return
+        const data = await res.json()
+        setAllCities(data.cities ?? [])
+      } catch (err) {
+        console.error("Failed to fetch cities", err)
+      }
+    }
+    fetchAllCities()
+  }, [])
+
+  const fetchBuses = async (fromCity: string, toCity: string) => {
+    setLoading(true)
+    try {
+      const res = await fetch("/api/buses", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fromCity, toCity }),
+      })
+      if (!res.ok) throw new Error("Failed to fetch buses")
+      const data = await res.json()
+      setBuslist(data.buses ?? [])
+    } catch (err) {
+      console.error(err)
+      setBuslist([])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSearch = async () => {
     if (!from || !to || !date) {
       setError("Please fill all the fields")
       return
@@ -47,27 +82,12 @@ export default function PassengersPage() {
       return
     }
     setError("")
+    await fetchBuses(from, to)
     setSearchedResult({ from, to, passengers, date })
   }
 
-  const [buslist, setBuslist] = useState<Bus[]>([])
-
-  useEffect(() => {
-    const data = getBuses() as unknown as Bus[]
-    const Json = buses.buses as Bus[]
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setBuslist([...data, ...Json])
-  }, [])
-
-  const allCities = Array.from(new Set([...buslist.map((bus) => bus.from), ...buslist.map((bus) => bus.to)]))
-
-  const filteredBuses = searchedResult
-    ? buslist.filter((bus) => {
-        return (
-          bus.from?.toLowerCase() === from.toLowerCase() && bus.to?.toLowerCase() === to.toLowerCase()
-        )
-      })
-    : []
+  // buslist is already filtered by the API — no client-side filter needed
+  const filteredBuses = buslist
 
   const HandleBooking = (bus: Bus) => {
     if (bus.seats === 0) {
@@ -136,19 +156,22 @@ export default function PassengersPage() {
                   <label className="mono text-[10px] tracking-widest uppercase opacity-60 flex items-center gap-1.5 mb-2">
                     <MapPin className="w-3 h-3" /> From
                   </label>
-                  <select
-                    className="w-full bg-paper/10 border border-paper/20 focus:border-tram rounded-xl px-4 py-3.5 text-sm font-medium outline-none transition-colors appearance-none cursor-pointer"
+                  <input
+                    type="text"
+                    list="from-cities"
+                    placeholder="Type city name..."
+                    className="w-full bg-paper/10 border border-paper/20 focus:border-tram rounded-xl px-4 py-3.5 text-sm font-medium outline-none transition-colors"
                     value={from}
                     onChange={(e) => setFrom(e.target.value)}
-                  >
-                    <option value="" className="text-ink">Select origin stop</option>
+                  />
+                  <datalist id="from-cities">
                     {allCities.map((city) => (
-                      <option key={city} value={city} className="text-ink">{city}</option>
+                      <option key={city} value={city} />
                     ))}
-                  </select>
+                  </datalist>
                 </div>
 
-                {/* Swap icon visual */}
+                {/* Swap icon */}
                 <div className="hidden md:flex md:col-span-1 items-end justify-center pb-2">
                   <div className="w-10 h-10 rounded-full border border-paper/20 grid place-items-center">
                     <ArrowRight className="w-4 h-4 text-tram" />
@@ -160,18 +183,20 @@ export default function PassengersPage() {
                   <label className="mono text-[10px] tracking-widest uppercase opacity-60 flex items-center gap-1.5 mb-2">
                     <MapPin className="w-3 h-3" /> To
                   </label>
-                  <select
-                    className="w-full bg-paper/10 border border-paper/20 focus:border-tram rounded-xl px-4 py-3.5 text-sm font-medium outline-none transition-colors appearance-none cursor-pointer"
+                  <input
+                    type="text"
+                    list="to-cities"
+                    placeholder="Type city name..."
+                    className="w-full bg-paper/10 border border-paper/20 focus:border-tram rounded-xl px-4 py-3.5 text-sm font-medium outline-none transition-colors"
                     value={to}
                     onChange={(e) => setTo(e.target.value)}
-                  >
-                    <option value="" className="text-ink">Select destination stop</option>
+                  />
+                  <datalist id="to-cities">
                     {allCities.filter((city) => city !== from).map((city) => (
-                      <option key={city} value={city} className="text-ink">{city}</option>
+                      <option key={city} value={city} />
                     ))}
-                  </select>
+                  </datalist>
                 </div>
-
                 {/* Date */}
                 <div className="md:col-span-2">
                   <label className="mono text-[10px] tracking-widest uppercase opacity-60 flex items-center gap-1.5 mb-2">
@@ -203,9 +228,13 @@ export default function PassengersPage() {
                 <div className="md:col-span-1 flex items-end">
                   <button
                     onClick={handleSearch}
-                    className="w-full bg-tram text-ink rounded-xl py-3.5 font-medium hover:bg-paper transition-colors flex items-center justify-center gap-1.5 group"
+                    disabled={loading}
+                    className="w-full bg-tram text-ink rounded-xl py-3.5 font-medium hover:bg-paper transition-colors flex items-center justify-center gap-1.5 group disabled:opacity-60"
                   >
-                    <SearchIcon className="w-4 h-4" />
+                    {loading
+                      ? <Loader2 className="w-4 h-4 animate-spin" />
+                      : <SearchIcon className="w-4 h-4" />
+                    }
                   </button>
                 </div>
               </div>
@@ -280,8 +309,7 @@ export default function PassengersPage() {
               <div className="flex items-end justify-between flex-wrap gap-4 pb-5 border-b border-ink/20">
                 <div>
                   <div className="mono text-[10px] tracking-widest uppercase text-muted-foreground mb-2">
-                    {filteredBuses.length} result{filteredBuses.length !== 1 && "s"} ·{" "}
-                    {searchedResult.date}
+                    {loading ? "Searching…" : `${filteredBuses.length} result${filteredBuses.length !== 1 ? "s" : ""} · ${searchedResult.date}`}
                   </div>
                   <h2 className="display text-3xl md:text-5xl leading-tight tracking-tight text-ink">
                     {searchedResult.from}{" "}
@@ -299,7 +327,12 @@ export default function PassengersPage() {
                 </div>
               </div>
 
-              {filteredBuses.length > 0 ? (
+              {loading ? (
+                <div className="flex items-center justify-center py-20 gap-3 text-muted-foreground">
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span className="mono text-[10px] tracking-widest uppercase">Fetching buses…</span>
+                </div>
+              ) : filteredBuses.length > 0 ? (
                 <div className="space-y-4">
                   {filteredBuses.map((bus) => (
                     <article
@@ -316,7 +349,6 @@ export default function PassengersPage() {
                             <div className="mono text-[9px] tracking-widest opacity-60">BUS</div>
                             <div className="mono text-xs font-medium">{bus.name.slice(0, 10)}</div>
                           </div>
-                          {/* Perforation */}
                           <div className="hidden md:block absolute -right-1.5 top-1/2 -translate-y-1/2 w-3 h-3 bg-paper rounded-full" />
                         </div>
 
@@ -354,7 +386,6 @@ export default function PassengersPage() {
                             </div>
                           </div>
 
-                          {/* Perforation right */}
                           <div className="hidden md:block absolute -right-1.5 top-1/2 -translate-y-1/2 w-3 h-3 bg-paper rounded-full" />
                         </div>
 

@@ -11,7 +11,7 @@ export async function DELETE(req: NextRequest, context: { params: Promise<{ id: 
 
         if (!authHeader) {
             return NextResponse.json(
-                { error: "No tken provided" },
+                { error: "No token provided" },
                 { status: 401 }
             )
         }

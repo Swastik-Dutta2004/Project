@@ -17,7 +17,7 @@ export async function GET(req:NextRequest) {
 
         const decode = jwt.verify(
             token,
-            process.env.jWT_SECRET!
+            process.env.JWT_SECRET!
         ) as {
             userId: number;
             email: string;
@@ -29,7 +29,7 @@ export async function GET(req:NextRequest) {
             },
             include: {
                 bus: true
-            }
+            }   
         })
 
         return NextResponse.json(
