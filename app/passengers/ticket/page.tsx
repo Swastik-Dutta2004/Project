@@ -137,6 +137,9 @@ function TicketPageContent() {
       }
 
       const bookingData = await bookingRes.json()
+      if (!bookingData.booking) {
+        throw new Error(bookingData.error || "Failed to create booking")
+      }
       const bid = bookingData.booking.id
       const generatedPnr = bookingData.booking.pnr
       setBookingId(bid)

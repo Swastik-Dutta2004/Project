@@ -3,70 +3,80 @@ import { routes1 } from "../data/buses";
 import { STOP_ALIASES } from "../data/stopAliases";
 import "dotenv/config";
 
+function parseRoute(route: string) {
+  const parts = route.split(" : ");
+  const routeInfo = parts[0];
+
+  const viaMatch = routeInfo.match(/\[[\s]*via[\s]*:([^\]]*)\]/i);
+  if (!viaMatch) return null;
+
+  const stopsPart = viaMatch[1].trim();
+  const beforeStops = routeInfo.slice(0, viaMatch.index).trim();
+
+  const toMatch = beforeStops.match(/\bto\b/i);
+  if (!toMatch) return null;
+
+  const destination = beforeStops.slice(toMatch.index! + 2).trim();
+  const originAndCode = beforeStops.slice(0, toMatch.index).trim();
+
+  const busNameColon = originAndCode.lastIndexOf(":");
+  const busName = busNameColon >= 0
+    ? originAndCode.slice(0, busNameColon).trim()
+    : originAndCode;
+
+  const origin = busNameColon >= 0
+    ? originAndCode.slice(busNameColon + 1).trim()
+    : originAndCode;
+
+  const stops = [
+    ...new Set(
+      stopsPart
+        .split(",")
+        .map((s) => s.trim().replace(/^\(.*?\)\s*/, ""))
+        .filter(Boolean)
+        .map((stop) => STOP_ALIASES[stop] ?? stop)
+    ),
+  ];
+
+  return { busName, fromCity: origin, toCity: destination, stops };
+}
+
 async function main() {
   const buses = [];
   for (const route of routes1) {
     try {
-      const parts = route.split(" : ");
-
-      const routeInfo = parts[0];
-
-      const firstColonIndex = routeInfo.indexOf(":");
-
-      const busName = routeInfo.slice(0, firstColonIndex);
-      const routeText = routeInfo.slice(firstColonIndex + 1);
-
-      const viaIndex = routeText.indexOf("[via:");
-
-      const citiesPart = routeText.slice(0, viaIndex).trim();
-      const stopsPart = routeText
-        .slice(viaIndex + 5)
-        .replace("]", "")
-        .trim();
-
-      const [fromCity, toCity] = citiesPart
-        .trim()
-        .split(" to ")
-        .map((v) => v.trim());
-
-      const stops = [
-        ...new Set(
-          stopsPart
-            .split(",")
-            .map((s) => s.trim())
-            .filter(Boolean)
-            .map((stop) => STOP_ALIASES[stop] ?? stop)
-        ),
-      ];
-
+      const parsed = parseRoute(route);
+      if (!parsed) {
+        console.error("Failed to parse:", route.slice(0, 80));
+        continue;
+      }
 
       buses.push({
-        busName: busName.trim(),
-        fromCity,
-        toCity,
-        stops,
+        busName: parsed.busName,
+        fromCity: parsed.fromCity,
+        toCity: parsed.toCity,
+        stops: parsed.stops,
         departureTime: "",
         arrivalTime: "",
         price: 0,
         totalSeats: 40,
       });
 
-      console.log(`Imported ${busName}`);
-
-    } catch (err) {
-      console.error("Failed:", route);
-
-      if (err instanceof Error) {
-        console.error(err.message);
+      if (buses.length % 100 === 0) {
+        console.log(`Parsed ${buses.length} routes...`);
       }
-
-      console.error(err);
+    } catch (err) {
+      console.error("Failed:", route.slice(0, 80));
+      if (err instanceof Error) console.error(err.message);
     }
   }
 
-  await prisma.bus.createMany({
-    data: buses,
-  });
+  console.log(`Importing ${buses.length} buses into database...`);
+  for (let i = 0; i < buses.length; i += 50) {
+    await prisma.bus.createMany({
+      data: buses.slice(i, i + 50),
+    });
+  }
 
   console.log(`Imported ${buses.length} buses`);
 }
