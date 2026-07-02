@@ -1,67 +1,81 @@
 
-bardhaman
-["Bardhaman","Bardhaman Station"]
+hematpur more
+[". Hematpur More","Hematpur More"]
 
-baruipur
-["Baruipur","Baruipur Station"]
+airport gate 3
+["Airport 3No.","Airport 3no."]
 
-belmuri
-["Belmuri","Belmuri Station"]
+bbd bag
+["BBD Bag","Dalhousie"]
 
-bhagabanpur
-["Bhagabanpur","Bhagabanpur More"]
+baguiati
+["Baguiati","Baguihati"]
 
-birati
-["Birati More","Birati Station"]
+barddhaman
+["Barddhaman","Barddhaman(Nawabhat Bus Stand)"]
 
-canning
-["Canning","Canning Station"]
+barddhaman station
+["Barddhaman Station","Barddhaman station"]
 
-dankuni
-["Dankuni","Dankuni Station"]
+beleghata
+["Beleghata","Beliaghata"]
 
-golabari
-["Golabari","Golabari More"]
+bhabani bhawan
+["Bhabani Bhawan","Bhawani Bhawan"]
 
-hasnabad
-["Hasnabad","Hasnabad Station"]
+bhowanipore
+["Bhowanipore","Bhowanipur"]
 
-liluah don bosco
+chaulkhola
+["Chaulkhola","Chaulkhola (Mandarmani)"]
+
+city center 1
+["City Center","City Center 1","City Centre"]
+
+contai
+["Contai","Contai (Kanthi)"]
+
+dhrubabazar
+["Dhruba Bazar","Dhrubabazar"]
+
+durgapur city center
+["Durgapur City Center","Durgapur City Centre"]
+
+esplanade
+["Esplanade","Esplanade (Halt)","Esplanade (Kolkata Halt)","Esplanade (Kolkata)","Esplanade (halt)","Esplanade(halt)"]
+
+kakdwip station
+["Kakdwip Station","Kakdwip Station (Bamuner More)"]
+
+kidderpore
+["Khidderpore","Kidderpore"]
+
+liluah
 ["Liluah ( Don Bosco)","Liluah (Don Bosco)"]
 
-madhabpur
-["Madhabpur","Madhabpur More"]
+maidan
+["Maidan","Maidan Metro"]
 
-namkhana
-["Namkhana","Namkhana Station"]
+mallick bazar
+["Mallick Bazar","Mallickbazar"]
 
-polerhat
-["Polerhat","Polerhat more"]
+mominpore
+["Mominpore","Mominpur"]
 
-raichak
-["Raichak","Raichak More"]
+natun rasta
+["Natun Rasta","Notun Rastar"]
 
-rathtala
-["Rathtala","Rathtala More"]
+rajabazar
+["Rajabajar","Rajabazar"]
 
-santoshpur
-["Santoshpur","Santoshpur Station"]
+ruby
+["Ruby","Ruby Hospital"]
 
-sarisha
-["Sarisha","Sarisha More"]
+sakher bazar
+["Sakher Bazar","Sakherbazar"]
 
-sinthee
-["Sinthee","Sinthee More"]
+sealdah
+["Sealdah","Sealdah Station"]
 
-sodepur
-["Sodepur","Sodepur Station"]
-
-sonarpur
-["Sonarpur","Sonarpur Station"]
-
-tangra
-["Tangra","Tangra More"]
-
-
-
-fixed: 1. admin section 
+uluberia
+["Uluberia","Uluberia(Nimdighi)"]

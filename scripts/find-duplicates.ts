@@ -1,5 +1,6 @@
 import stops from "../all-stops.json";
 import fs from "fs";
+import { canon } from "../lib/stopCleaner";   
 
 
 function normalize(stop: string) {
@@ -15,7 +16,7 @@ function normalize(stop: string) {
 const groups = new Map<string, string[]>();
 
 for (const stop of stops) {
-  const key = normalize(stop);
+  const key = canon(stop);
 
   if (!groups.has(key)) {
     groups.set(key, []);

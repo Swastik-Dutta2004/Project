@@ -1,6 +1,6 @@
 import { prisma } from "../lib/prisma";
 import { routes1 } from "../data/buses";
-import { STOP_ALIASES } from "../data/stopAliases";
+import { canon } from "../lib/stopCleaner";
 import "dotenv/config";
 
 function parseRoute(route: string) {
@@ -32,13 +32,17 @@ function parseRoute(route: string) {
     ...new Set(
       stopsPart
         .split(",")
-        .map((s) => s.trim().replace(/^\(.*?\)\s*/, ""))
+        .map(canon)
         .filter(Boolean)
-        .map((stop) => STOP_ALIASES[stop] ?? stop)
     ),
   ];
 
-  return { busName, fromCity: origin, toCity: destination, stops };
+  return {
+    busName,
+    fromCity: canon(origin),
+    toCity: canon(destination),
+    stops
+  }
 }
 
 async function main() {
