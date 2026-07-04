@@ -1,5 +1,5 @@
 import { prisma } from "../lib/prisma";
-import { routes1 } from "../data/buses";
+import { routes1 } from "../data/raw_busrepo_routes1";
 import { canon } from "../lib/stopCleaner";
 import "dotenv/config";
 
