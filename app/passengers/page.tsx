@@ -1,8 +1,8 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowRight, Search as SearchIcon, MapPin, Users, ArrowUpRight, Bus, Clock, Loader2, Ticket, MapIcon } from "lucide-react"
+import { ArrowRight, Search as SearchIcon, MapPin, Users, ArrowUpRight, Bus, Clock, Loader2, Ticket, MapIcon, ChevronDown, X } from "lucide-react"
 import "leaflet/dist/leaflet.css"
 import dynamic from "next/dynamic"
 
@@ -38,6 +38,14 @@ interface Bus {
   stops: string[]
 }
 
+// A stop/city option, as returned by /api/buses/cities.
+// routeCount is optional so the UI still works if the API hasn't been
+// updated yet to return counts (falls back to hiding the count badge).
+interface CityOption {
+  name: string
+  routeCount?: number
+}
+
 export default function PassengersPage() {
   const [from, setFrom] = useState("")
   const [to, setTo] = useState("")
@@ -46,22 +54,87 @@ export default function PassengersPage() {
   const [searchedResult, setSearchedResult] = useState<SearchResult | null>(null)
   const [error, setError] = useState("")
   const [buslist, setBuslist] = useState<Bus[]>([])
-  const [allCities, setAllCities] = useState<string[]>([])
+  const [allCities, setAllCities] = useState<CityOption[]>([])
+  const [citiesError, setCitiesError] = useState("")
   const [loading, setLoading] = useState(false)
+  const [openDropdown, setOpenDropdown] = useState<"from" | "to" | null>(null)
+  const [filterText, setFilterText] = useState("")
+  const dropdownRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
 
   useEffect(() => {
     async function fetchAllCities() {
       try {
-        const res = await fetch("/api/buses/cities")
-        if (!res.ok) return
+        const token = localStorage.getItem("token")
+        const res = await fetch("/api/buses/cities", {
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        })
+
+        if (!res.ok) {
+          // Log the actual failure instead of silently returning — a 401
+          // here (missing/expired token) is the most common reason the
+          // dropdown ends up empty with no visible error anywhere.
+          const body = await res.text().catch(() => "")
+          console.error(`Failed to fetch cities: ${res.status} ${res.statusText}`, body)
+          setCitiesError(`Could not load stops (${res.status})`)
+          return
+        }
+
         const data = await res.json()
-        setAllCities(data.cities ?? [])
+        const raw = data.cities ?? data.stops ?? data.data ?? []
+
+        if (!Array.isArray(raw)) {
+          console.error("Unexpected /api/buses/cities response shape:", data)
+          setCitiesError("Unexpected response from server")
+          return
+        }
+
+        // Normalize: API may return string[] (legacy), or objects using
+        // any of a few common key names, or { name, routeCount }[] once
+        // the backend is updated to include counts.
+        const normalized: CityOption[] = raw
+          .map((c: any) => {
+            if (typeof c === "string") return { name: c }
+            const name = c.name ?? c.city ?? c.cityName ?? c.stopName ?? c.stop
+            if (!name) return null
+            const routeCount = c.routeCount ?? c.routes ?? c.count
+            return { name, routeCount: typeof routeCount === "number" ? routeCount : undefined }
+          })
+          .filter((c: CityOption | null): c is CityOption => c !== null)
+
+        if (normalized.length === 0 && raw.length > 0) {
+          console.error("Received cities but couldn't read names from them. Raw sample:", raw[0])
+        }
+
+        setCitiesError("")
+        setAllCities(normalized)
       } catch (err) {
         console.error("Failed to fetch cities", err)
+        setCitiesError("Could not load stops")
       }
     }
     fetchAllCities()
+  }, [])
+
+  useEffect(() => {
+    function handleInteraction(e: MouseEvent | KeyboardEvent) {
+      if (e instanceof KeyboardEvent && e.key !== "Escape") return
+      if (e instanceof MouseEvent && dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setOpenDropdown(null)
+        setFilterText("")
+        return
+      }
+      if (e instanceof KeyboardEvent && e.key === "Escape") {
+        setOpenDropdown(null)
+        setFilterText("")
+      }
+    }
+    document.addEventListener("mousedown", handleInteraction)
+    document.addEventListener("keydown", handleInteraction)
+    return () => {
+      document.removeEventListener("mousedown", handleInteraction)
+      document.removeEventListener("keydown", handleInteraction)
+    }
   }, [])
 
   const fetchBuses = async (fromCity: string, toCity: string) => {
@@ -158,6 +231,139 @@ export default function PassengersPage() {
     router.push(`/passengers/payment?${query.toString()}`)
   }
 
+  const renderStopDropdown = (field: "from" | "to") => {
+    const excluded = field === "from" ? to : from
+    const options = allCities
+      .filter((c) => c.name !== excluded)
+      .filter((c) => c.name.toLowerCase().includes(filterText.toLowerCase()))
+
+    const popularStops = options.filter((c) => typeof c.routeCount === "number" && c.routeCount >= 3)
+    const otherStops = options.filter((c) => !popularStops.includes(c))
+
+    return (
+      <div className="absolute top-full left-0 right-0 mt-2 bg-ink text-paper rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+        {/* Search input */}
+        <div className="p-3 border-b border-paper/10">
+          <div className="relative">
+            <SearchIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-paper/40" />
+            <input
+              type="text"
+              placeholder="Search any stop…"
+              className="w-full bg-paper/8 border border-paper/15 focus:border-tram rounded-xl pl-10 pr-4 py-2.5 text-sm text-paper outline-none placeholder:text-paper/30 transition-colors"
+              value={filterText}
+              onChange={(e) => setFilterText(e.target.value)}
+              autoFocus
+            />
+          </div>
+        </div>
+
+        {/* Stop list */}
+        <div className="overflow-y-auto max-h-80 no-scrollbar">
+          {citiesError && (
+            <div className="px-4 py-6 text-center">
+              <div className="text-paper/40 mono text-[10px] tracking-[0.2em] uppercase">
+                {citiesError}
+              </div>
+            </div>
+          )}
+
+          {!citiesError && popularStops.length > 0 && !filterText && (
+            <div>
+              <div className="px-4 pt-3 pb-1.5">
+                <span className="mono text-[9px] tracking-[0.25em] uppercase text-tram">
+                  Popular Stops
+                </span>
+              </div>
+              {popularStops.map((city) => (
+                <button
+                  key={city.name}
+                  type="button"
+                  onClick={() => {
+                    if (field === "from") setFrom(city.name)
+                    else setTo(city.name)
+                    setOpenDropdown(null)
+                    setFilterText("")
+                  }}
+                  className="w-full text-left px-4 py-3 hover:bg-paper/8 transition-colors flex items-center justify-between group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-1.5 h-1.5 rounded-full bg-tram shrink-0" />
+                    <span className="text-[14px] font-medium text-paper group-hover:text-tram transition-colors">
+                      {city.name}
+                    </span>
+                  </div>
+                  {typeof city.routeCount === "number" && (
+                    <span className="mono text-[10px] tracking-wide text-paper/40 whitespace-nowrap border border-paper/15 rounded-full px-2 py-0.5">
+                      {city.routeCount} routes
+                    </span>
+                  )}
+                </button>
+              ))}
+              {otherStops.length > 0 && (
+                <div className="mx-4 border-b border-paper/8" />
+              )}
+            </div>
+          )}
+
+          {!citiesError && otherStops.length > 0 && (
+            <div>
+              {popularStops.length > 0 && !filterText && (
+                <div className="px-4 pt-3 pb-1.5">
+                  <span className="mono text-[9px] tracking-[0.25em] uppercase text-paper/30">
+                    All Stops
+                  </span>
+                </div>
+              )}
+              {(filterText ? options : otherStops).map((city) => (
+                <button
+                  key={city.name}
+                  type="button"
+                  onClick={() => {
+                    if (field === "from") setFrom(city.name)
+                    else setTo(city.name)
+                    setOpenDropdown(null)
+                    setFilterText("")
+                  }}
+                  className="w-full text-left px-4 py-3 hover:bg-paper/8 transition-colors flex items-center justify-between group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-1.5 h-1.5 rounded-full bg-paper/20 group-hover:bg-tram shrink-0 transition-colors" />
+                    <span className="text-[14px] text-paper/70 group-hover:text-paper transition-colors">
+                      {city.name}
+                    </span>
+                  </div>
+                  {typeof city.routeCount === "number" && (
+                    <span className="mono text-[10px] tracking-wide text-paper/25 whitespace-nowrap">
+                      {city.routeCount}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {!citiesError && options.length === 0 && (
+            <div className="px-4 py-8 text-center">
+              <div className="text-paper/20 mono text-[10px] tracking-[0.25em] uppercase">
+                {allCities.length === 0 ? "No stops loaded yet" : `No stops match "${filterText}"`}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="px-4 py-2.5 border-t border-paper/10 flex items-center justify-between">
+          <span className="mono text-[9px] tracking-wide text-paper/25">
+            {options.length} stop{options.length !== 1 ? "s" : ""} available
+          </span>
+          <span className="mono text-[9px] tracking-wide text-paper/25">
+            esc to close
+          </span>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="font-sans">
       {/* ── Editorial header strip ─────────────────────────── */}
@@ -191,7 +397,16 @@ export default function PassengersPage() {
 
         {/* Search "boarding pass" */}
         <div className="mx-auto max-w-[1400px] px-5 md:px-10 -mb-12 md:-mb-14 relative z-10">
-          <div className="bg-ink text-paper rounded-2xl overflow-hidden paper-grain">
+          {/*
+            NOTE: outer card no longer has overflow-hidden — that was
+            clipping the absolutely-positioned dropdown into the card,
+            making it look "merged" into the search box instead of
+            floating over the page. The paper-grain texture still gets
+            clipped to the rounded corners via the separate inset layer
+            below, so the visual look is unchanged.
+          */}
+          <div className="bg-ink text-paper rounded-2xl relative">
+            <div className="absolute inset-0 rounded-2xl overflow-hidden paper-grain pointer-events-none" />
             <div className="relative z-10 p-4 md:p-6">
               <div className="flex items-center justify-between mb-4 pb-3 border-b border-paper/15">
                 <div className="flex items-center gap-3">
@@ -203,52 +418,62 @@ export default function PassengersPage() {
                 <span className="stamp text-tram border-tram">Open</span>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-12 gap-2.5 md:gap-3">
+              <div ref={dropdownRef} className="grid grid-cols-2 md:grid-cols-12 gap-2.5 md:gap-3">
                 {/* From */}
-                <div className="col-span-2 md:col-span-4">
+                <div className="col-span-2 md:col-span-4 relative">
                   <label className="mono text-[10px] tracking-widest uppercase opacity-60 flex items-center gap-1.5 mb-1.5">
-                    <MapPin className="w-3 h-3" /> From
+                    <MapPin className="w-3 h-3" /> From — Starting Stand
                   </label>
-                  <input
-                    type="text"
-                    list="from-cities"
-                    placeholder="Type city name..."
-                    className="w-full bg-paper/10 border border-paper/20 focus:border-tram rounded-xl px-3 py-2.5 text-sm font-medium outline-none transition-colors"
-                    value={from}
-                    onChange={(e) => setFrom(e.target.value)}
-                  />
-                  <datalist id="from-cities">
-                    {allCities.map((city) => (
-                      <option key={city} value={city} />
-                    ))}
-                  </datalist>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOpenDropdown(openDropdown === "from" ? null : "from")
+                        setFilterText("")
+                      }}
+                      className="w-full bg-paper/10 border border-paper/20 focus:border-tram rounded-xl px-3 py-2.5 text-sm font-medium outline-none transition-colors text-left flex items-center justify-between"
+                    >
+                      <span className={from ? "text-paper" : "text-paper/40"}>
+                        {from || "Select stop..."}
+                      </span>
+                      <ChevronDown className={`w-4 h-4 text-paper/50 transition-transform ${openDropdown === "from" ? "rotate-180" : ""}`} />
+                    </button>
+                    {openDropdown === "from" && renderStopDropdown("from")}
+                  </div>
                 </div>
 
                 {/* Swap icon */}
                 <div className="hidden md:flex md:col-span-1 items-end justify-center pb-1.5">
-                  <div className="w-8 h-8 rounded-full border border-paper/20 grid place-items-center">
+                  <button
+                    type="button"
+                    onClick={() => { const temp = from; setFrom(to); setTo(temp) }}
+                    className="w-8 h-8 rounded-full border border-paper/20 grid place-items-center hover:bg-paper/10 transition-colors"
+                  >
                     <ArrowRight className="w-3.5 h-3.5 text-tram" />
-                  </div>
+                  </button>
                 </div>
 
                 {/* To */}
-                <div className="col-span-2 md:col-span-3">
+                <div className="col-span-2 md:col-span-3 relative">
                   <label className="mono text-[10px] tracking-widest uppercase opacity-60 flex items-center gap-1.5 mb-1.5">
                     <MapPin className="w-3 h-3" /> To
                   </label>
-                  <input
-                    type="text"
-                    list="to-cities"
-                    placeholder="Type city name..."
-                    className="w-full bg-paper/10 border border-paper/20 focus:border-tram rounded-xl px-3 py-2.5 text-sm font-medium outline-none transition-colors"
-                    value={to}
-                    onChange={(e) => setTo(e.target.value)}
-                  />
-                  <datalist id="to-cities">
-                    {allCities.filter((city) => city !== from).map((city) => (
-                      <option key={city} value={city} />
-                    ))}
-                  </datalist>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOpenDropdown(openDropdown === "to" ? null : "to")
+                        setFilterText("")
+                      }}
+                      className="w-full bg-paper/10 border border-paper/20 focus:border-tram rounded-xl px-3 py-2.5 text-sm font-medium outline-none transition-colors text-left flex items-center justify-between"
+                    >
+                      <span className={to ? "text-paper" : "text-paper/40"}>
+                        {to || "Select stop..."}
+                      </span>
+                      <ChevronDown className={`w-4 h-4 text-paper/50 transition-transform ${openDropdown === "to" ? "rotate-180" : ""}`} />
+                    </button>
+                    {openDropdown === "to" && renderStopDropdown("to")}
+                  </div>
                 </div>
 
                 {/* Seats */}
