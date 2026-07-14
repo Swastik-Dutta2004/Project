@@ -101,7 +101,7 @@ function PaymentPageContent() {
         const selectedBus = busList.find((b: BusData) => b.busName === busName) ?? busList[0]
         setSelectedBus(selectedBus)
 
-        const stops = selectedBus.stops || []
+        const stops = [selectedBus.fromCity, ...(selectedBus.stops || []), selectedBus.toCity]
         const fromIdx = stops.findIndex((s: string) => s.toLowerCase() === from.toLowerCase())
         const toIdx = stops.findIndex((s: string) => s.toLowerCase() === to.toLowerCase())
         let betweenStops: string[] = []

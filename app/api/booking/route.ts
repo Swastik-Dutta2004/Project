@@ -35,11 +35,11 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Bus not found" }, { status: 404 });
         }
 
-        const stops = bus.stops;
-        const fromIdx = stops.findIndex(
+        const allStops = [bus.fromCity, ...bus.stops, bus.toCity];
+        const fromIdx = allStops.findIndex(
             (s) => s.toLowerCase() === body.fromCity.toLowerCase()
         );
-        const toIdx = stops.findIndex(
+        const toIdx = allStops.findIndex(
             (s) => s.toLowerCase() === body.toCity.toLowerCase()
         );
 
@@ -50,7 +50,7 @@ export async function POST(req: Request) {
             );
         }
 
-        const routeStops = stops.slice(fromIdx, toIdx + 1);
+        const routeStops = allStops.slice(fromIdx, toIdx + 1);
         const distance = calculateRouteDistance(routeStops);
         const fare = calculateFare(distance);
 

@@ -90,7 +90,7 @@ function TicketPageContent() {
           return
         }
 
-        const stops = busList[0].stops || []
+        const stops = [busList[0].fromCity, ...(busList[0].stops || []), busList[0].toCity]
         const fromIdx = stops.findIndex((s: string) => s.toLowerCase() === from.toLowerCase())
         const toIdx = stops.findIndex((s: string) => s.toLowerCase() === to.toLowerCase())
         let betweenStops: string[] = []
